@@ -1,0 +1,707 @@
+/* globals.css */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Warm Wood Tones - Light Mode */
+  --background: oklch(0.96 0.01 45);
+  --foreground: oklch(0.16 0.02 45);
+  --card: oklch(0.98 0 0);
+  --card-foreground: oklch(0.16 0.02 45);
+  --popover: oklch(0.98 0 0);
+  --popover-foreground: oklch(0.16 0.02 45);
+  --primary: oklch(0.42 0.08 45);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.68 0.04 50);
+  --secondary-foreground: oklch(0.16 0.02 45);
+  --muted: oklch(0.88 0.02 50);
+  --muted-foreground: oklch(0.48 0.02 50);
+  --accent: oklch(0.52 0.12 45);
+  --accent-foreground: oklch(0.98 0 0);
+  --destructive: oklch(0.65 0.25 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --success: oklch(0.62 0.15 145);
+  --success-foreground: oklch(0.98 0 0);
+  --warning: oklch(0.8 0.15 75);
+  --warning-foreground: oklch(0.16 0.02 45);
+  --info: oklch(0.7 0.1 220);
+  --info-foreground: oklch(0.16 0.02 45);
+  --active: oklch(0.45 0.1 45);
+  --active-foreground: oklch(0.98 0 0);
+  --border: oklch(0.9 0.01 50);
+  --input: oklch(0.96 0.01 50);
+  --input-hover: oklch(0.92 0.01 50);
+  --ring: oklch(0.42 0.08 45);
+  --chart-1: oklch(0.42 0.08 45);
+  --chart-2: oklch(0.68 0.04 50);
+  --chart-3: oklch(0.52 0.12 45);
+  --chart-4: oklch(0.58 0.06 40);
+  --chart-5: oklch(0.48 0.02 50);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.96 0.01 45);
+  --sidebar-foreground: oklch(0.16 0.02 45);
+  --sidebar-primary: oklch(0.42 0.08 45);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.88 0.02 50);
+  --sidebar-accent-foreground: oklch(0.16 0.02 45);
+  --sidebar-border: oklch(0.9 0.01 50);
+  --sidebar-ring: oklch(0.42 0.08 45);
+}
+
+.dark {
+  --background: oklch(0.15 0.01 45);
+  --foreground: oklch(0.95 0.01 50);
+  --card: oklch(0.2 0.01 45);
+  --card-foreground: oklch(0.95 0.01 50);
+  --popover: oklch(0.2 0.01 45);
+  --popover-foreground: oklch(0.95 0.01 50);
+  --primary: oklch(0.62 0.1 45);
+  --primary-foreground: oklch(0.15 0.01 45);
+  --secondary: oklch(0.48 0.02 50);
+  --secondary-foreground: oklch(0.95 0.01 50);
+  --muted: oklch(0.3 0.01 50);
+  --muted-foreground: oklch(0.68 0.01 50);
+  --accent: oklch(0.72 0.14 45);
+  --accent-foreground: oklch(0.15 0.01 45);
+  --destructive: oklch(0.65 0.25 27);
+  --destructive-foreground: oklch(0.95 0.01 50);
+  --success: oklch(0.72 0.15 145);
+  --success-foreground: oklch(0.15 0.01 45);
+  --warning: oklch(0.85 0.15 75);
+  --warning-foreground: oklch(0.15 0.01 45);
+  --info: oklch(0.75 0.1 220);
+  --info-foreground: oklch(0.15 0.01 45);
+  --active: oklch(0.65 0.12 45);
+  --active-foreground: oklch(0.15 0.01 45);
+  --border: oklch(0.28 0.01 50);
+  --input: oklch(0.22 0.01 50);
+  --input-hover: oklch(0.28 0.01 50);
+  --ring: oklch(0.62 0.1 45);
+  --chart-1: oklch(0.62 0.1 45);
+  --chart-2: oklch(0.48 0.02 50);
+  --chart-3: oklch(0.72 0.14 45);
+  --chart-4: oklch(0.58 0.06 40);
+  --chart-5: oklch(0.68 0.01 50);
+  --sidebar: oklch(0.15 0.01 45);
+  --sidebar-foreground: oklch(0.95 0.01 50);
+  --sidebar-primary: oklch(0.62 0.1 45);
+  --sidebar-primary-foreground: oklch(0.15 0.01 45);
+  --sidebar-accent: oklch(0.3 0.01 50);
+  --sidebar-accent-foreground: oklch(0.95 0.01 50);
+  --sidebar-border: oklch(0.28 0.01 50);
+  --sidebar-ring: oklch(0.62 0.1 45);
+}
+
+@theme inline {
+  /* استخدام الخطوط العربية المحددة في layout.tsx */
+  --font-sans: var(--font-cairo), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-tajawal), monospace;
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-active: var(--active);
+  --color-active-foreground: var(--active-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-input-hover: var(--input-hover);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --shadow-sm: 0 1px 2px 0 oklch(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 oklch(0 0 0 / 0.1), 0 1px 2px -1px oklch(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px oklch(0 0 0 / 0.1), 0 2px 4px -2px oklch(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px oklch(0 0 0 / 0.1), 0 4px 6px -4px oklch(0 0 0 / 0.1);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+  
+  /* تحسينات إضافية */
+  ::selection {
+    @apply bg-primary/20 text-foreground;
+  }
+  
+  input:focus, textarea:focus, select:focus {
+    @apply ring-2 ring-ring/20;
+  }
+  
+  /* تحسين التجربة على الأجهزة المحمولة */
+  @media (max-width: 768px) {
+    :root {
+      --radius: 0.5rem;
+    }
+  }
+  
+  /* تحسينات للغة العربية */
+  html[dir="rtl"] {
+    * {
+      text-align: right;
+    }
+  }
+}
+
+/* أنماط إضافية للمكونات */
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+}
+
+.btn-primary {
+  @apply bg-primary text-primary-foreground hover:bg-primary/90;
+}
+
+.btn-secondary {
+  @apply bg-secondary text-secondary-foreground hover:bg-secondary/90;
+}
+
+/* أنيميشن مخصصة */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* تأثيرات 3D */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-3d {
+  transform-style: preserve-3d;
+}
+
+/* تحسينات للأنيميشن */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* تأثيرات الشريط السيني */
+.ribbon {
+  position: relative;
+  overflow: hidden;
+}
+
+.ribbon::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: 0.5s;
+}
+
+.ribbon:hover::before {
+  right: 100%;
+}
+
+/* تأثيرات الزجاج */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* تأثيرات النص المتحرك */
+.text-gradient {
+  background: linear-gradient(90deg, var(--color-primary), var(--color-secondary), var(--color-accent));
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textShine 3s linear infinite;
+}
+
+@keyframes textShine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* تأثيرات البارالاكس */
+.parallax {
+  transform-style: preserve-3d;
+}
+
+/* أنيميشن التدرج */
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 8s ease infinite;
+}
+
+/* تأثيرات النصوص العربية */
+.arabic-text {
+  line-height: 1.8;
+}
+
+/* تأثيرات الـ 3D */
+.card-3d {
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card-3d:hover {
+  transform: translateY(-10px) rotateX(5deg);
+}
+
+/* تحسينات للأيقونات */
+.icon-wrapper {
+  @apply inline-flex items-center justify-center;
+}
+
+.icon-spin {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* تأثيرات الظلال المتحركة */
+.shadow-animate {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.shadow-animate:hover {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+/* تحسينات للصور */
+.image-zoom {
+  transition: transform 0.5s ease;
+}
+
+.image-zoom:hover {
+  transform: scale(1.05);
+}
+
+/* تأثيرات خاصة لوضع الموبايل */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem !important;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  .mobile-padding {
+    @apply px-4;
+  }
+}
+
+/* أنميشن واتساب من layout.tsx */
+@keyframes whatsapp-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+}
+
+.whatsapp-button {
+  animation: whatsapp-pulse 2s infinite;
+}
+
+/* تخصيصات للخطوط العربية */
+.font-arabic {
+  font-family: var(--font-cairo), var(--font-tajawal), sans-serif;
+}
+
+/* تأثيرات الدخول والخروج */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* تخصيصات الشريط التمرير */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-secondary/10;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary/80;
+}
+
+/* تحسينات للنماذج */
+.form-input {
+  @apply w-full px-4 py-3 rounded-lg border border-input bg-background 
+         focus:outline-none focus:ring-2 focus:ring-ring/20 
+         transition-all duration-200;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-foreground mb-2;
+}
+
+/* تأثيرات الإشعارات */
+.notification {
+  @apply fixed z-50 transition-all duration-300;
+}
+
+.notification-success {
+  @apply bg-success text-success-foreground;
+}
+
+.notification-error {
+  @apply bg-destructive text-destructive-foreground;
+}
+
+/* تأثيرات البطاقات التفاعلية */
+.interactive-card {
+  @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+}
+
+/* تأثيرات التحميل */
+.loading-spinner {
+  @apply animate-spin rounded-full border-2 border-primary border-t-transparent;
+}
+
+/* تحسينات للروابط */
+.link-underline {
+  @apply relative after:absolute after:bottom-0 after:left-0 after:h-0.5 
+         after:w-0 after:bg-primary after:transition-all after:duration-300 
+         hover:after:w-full;
+}
+
+/* تأثيرات القوائم */
+.dropdown-menu {
+  @apply absolute z-50 mt-2 py-2 bg-card border border-border rounded-lg 
+         shadow-lg transition-all duration-200;
+}
+
+/* تخصيصات للأزرار */
+.btn-gradient {
+  @apply bg-gradient-to-r from-primary via-accent to-secondary 
+         text-white hover:shadow-lg hover:scale-105 transition-all;
+}
+
+/* تأثيرات الإطارات */
+.frame-effect {
+  @apply relative before:absolute before:inset-0 before:border-2 
+         before:border-primary/20 before:rounded-lg before:transition-all 
+         before:duration-300 hover:before:border-primary/40;
+}
+
+/* تحسينات للتأكيدات */
+.highlight {
+  @apply bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 
+         dark:text-yellow-200 px-2 py-1 rounded;
+}
+
+/* تأثيرات التنقل */
+.nav-link {
+  @apply relative py-2 px-4 transition-all duration-200 
+         hover:text-primary after:absolute after:bottom-0 after:left-1/2 
+         after:w-0 after:h-0.5 after:bg-primary after:transition-all 
+         after:duration-300 hover:after:w-3/4 hover:after:left-1/4;
+}
+
+/* تحسينات للجداول */
+.table-responsive {
+  @apply overflow-x-auto rounded-lg border border-border;
+}
+
+.table-striped tbody tr:nth-child(odd) {
+  @apply bg-secondary/5;
+}
+
+/* تأثيرات العروض */
+.discount-badge {
+  @apply absolute top-2 right-2 bg-red-500 text-white px-2 py-1 
+         rounded-lg text-sm font-bold animate-pulse;
+}
+
+/* تحسينات للفيديو والعناصر الوسائط */
+.media-container {
+  @apply relative overflow-hidden rounded-lg;
+}
+
+.media-overlay {
+  @apply absolute inset-0 bg-gradient-to-t from-black/50 to-transparent 
+         opacity-0 hover:opacity-100 transition-opacity duration-300;
+}
+
+/* تأثيرات التنقل بين الصفحات */
+.pagination {
+  @apply flex gap-2;
+}
+
+.pagination-item {
+  @apply px-3 py-2 rounded-lg border border-border hover:bg-primary 
+         hover:text-primary-foreground transition-all;
+}
+
+.pagination-active {
+  @apply bg-primary text-primary-foreground;
+}
+
+/* تأثيرات الإخفاء التدريجي */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-out {
+  animation: fadeOut 0.5s ease-out;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* تحسينات للأجهزة ذات الشاشات الكبيرة */
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1600px;
+  }
+}
+
+/* دعم للطباعة */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* تأثيرات خاصة للوضع المظلم */
+.dark .dark-invert {
+  filter: invert(1);
+}
+
+/* تحسينات للوضع المقلوب (RTL) */
+[dir="rtl"] .flip-x {
+  transform: scaleX(-1);
+}
+
+/* تأثيرات التموج */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%);
+  transform-origin: 50% 50%;
+}
+
+.ripple:focus:not(:active)::after {
+  animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
+}
+
+/* تحسينات النهاية للـ UI/UX */
+.attention-grab {
+  @apply relative overflow-hidden;
+}
+
+.attention-grab::before {
+  content: '';
+  @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent 
+         -translate-x-full;
+  animation: shine 2s infinite;
+}
+
+@keyframes shine {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* تأثيرات الإهتزاز */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* تأثيرات الطفو المتعدد */
+.floating-group > *:nth-child(1) {
+  animation: float 3s ease-in-out infinite;
+}
+
+.floating-group > *:nth-child(2) {
+  animation: float 3s ease-in-out infinite 0.5s;
+}
+
+.floating-group > *:nth-child(3) {
+  animation: float 3s ease-in-out infinite 1s;
+}
+
+/* تأثيرات المدخلات الحديثة */
+.modern-input {
+  @apply relative;
+}
+
+.modern-input input {
+  @apply w-full px-4 py-3 bg-transparent border-b-2 border-border 
+         focus:border-primary outline-none transition-all duration-300;
+}
+
+.modern-input label {
+  @apply absolute right-4 top-3 text-muted-foreground transition-all 
+         duration-300 pointer-events-none;
+}
+
+.modern-input input:focus + label,
+.modern-input input:not(:placeholder-shown) + label {
+  @apply -top-3 text-xs text-primary;
+}
+
+/* تأثيرات القوائم المنسدلة الحديثة */
+.modern-dropdown {
+  @apply relative;
+}
+
+.modern-dropdown-content {
+  @apply absolute z-50 mt-2 py-2 bg-card border border-border rounded-xl 
+         shadow-2xl backdrop-blur-lg opacity-0 invisible 
+         transition-all duration-300 scale-95 origin-top-right;
+}
+
+.modern-dropdown:hover .modern-dropdown-content {
+  @apply opacity-100 visible scale-100;
+}
