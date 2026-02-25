@@ -14,6 +14,14 @@ export function AIAssistant() {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const [hasHadFirstResponse, setHasHadFirstResponse] = useState(false)
+
+  useEffect(() => {
+    const hasInteracted = localStorage.getItem('modrenino_first_response')
+    if (hasInteracted === 'true') {
+      setHasHadFirstResponse(true)
+    }
+  }, [])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -32,10 +40,18 @@ export function AIAssistant() {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, userMessage] })
+        body: JSON.stringify({ 
+          messages: [...messages, userMessage],
+          isFirstMessage: !hasHadFirstResponse 
+        })
       })
 
       const data = await response.json()
+      
+      if (!hasHadFirstResponse) {
+        localStorage.setItem('modrenino_first_response', 'true')
+        setHasHadFirstResponse(true)
+      }
       
       setMessages(prev => [...prev, { 
         role: 'assistant', 
@@ -46,7 +62,7 @@ export function AIAssistant() {
       console.error('Error:', error)
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: 'هاي! 🤗 أنا مودرينو. تقدر تسألني عن الأسعار والمنتجات' 
+        content: 'عذراً، حصل خطأ. كلم أيمن على واتساب: 01015262864' 
       }])
     } finally {
       setIsLoading(false)
@@ -96,7 +112,7 @@ export function AIAssistant() {
 
           {/* الرسائل */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-            {messages.length === 0 && (
+            {messages.length === 0 && !hasHadFirstResponse && (
               <div className="bg-white p-4 rounded-2xl border border-gray-200">
                 <p className="text-sm">هاي! 🤗 أنا مودرينو. اسألني عن أي حاجة بخصوص الأثاث الدمياطي</p>
               </div>
@@ -113,7 +129,18 @@ export function AIAssistant() {
                   <div className={`rounded-2xl p-3 ${
                     m.role === 'user' ? 'bg-amber-600 text-white' : 'bg-white border border-gray-200'
                   }`}>
-                    <p className="text-sm whitespace-pre-wrap">{m.content}</p>
+                    {m.role === 'user' ? (
+                      <p className="text-sm whitespace-pre-wrap">{m.content}</p>
+                    ) : (
+                      <div 
+                        className="text-sm prose prose-sm max-w-none"
+                        style={{ 
+                          direction: 'rtl',
+                          fontFamily: 'Arial, sans-serif'
+                        }}
+                        dangerouslySetInnerHTML={{ __html: m.content }} 
+                      />
+                    )}
                   </div>
                 </div>
               </div>
@@ -154,7 +181,7 @@ export function AIAssistant() {
             
             <button
               type="button"
-              onClick={() => window.open('https://wa.me/201015262864', '_blank')}
+              onClick={() => window.open('https://wa.me/20101526264', '_blank')}
               className="w-full mt-2 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 rounded-xl text-sm"
             >
               <MessageCircle className="w-4 h-4" />
