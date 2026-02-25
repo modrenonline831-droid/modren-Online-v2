@@ -92,7 +92,7 @@ function formatProductDetails(product: any) {
   
   // تقسيم الوصف إذا كان موجود
   const description = product.description || 'قطعة فاخرة من الأثاث الدمياطي المودرن'
-  const features = description.split('\n').filter(f => f.trim())
+  const features = description.split('\n').filter((item: string) => item.trim() !== '')
   
   return `
     <div style="background: white; border-radius: 16px; padding: 20px; margin: 15px 0; border: 1px solid #eaeaea; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
@@ -112,7 +112,7 @@ function formatProductDetails(product: any) {
           
           <h3 style="margin: 15px 0 10px 0; color: #333;">📝 المواصفات:</h3>
           <ul style="list-style: none; padding: 0;">
-            ${features.map(f => `
+            ${features.map((f: string) => `
               <li style="margin: 8px 0; padding-right: 20px; position: relative;">
                 <span style="color: #3498db; margin-left: 8px;">•</span>
                 ${f}
@@ -167,10 +167,9 @@ function getRequestType(query: string, products: any[]): {
     return { type: 'product_details', product: specificProduct }
   }
   
-  // 2. طلب تفاصيل عن منتج (زي "مواصفات ايه" أو "عرفني عنه" بعد ما اتكلمنا عنه)
+  // 2. طلب تفاصيل عن منتج
   if (q.includes('مواصفات') || q.includes('تفاصيل') || q.includes('عرفني') || q.includes('مزيد')) {
-    // لو في آخر منتج اتعرض في المحادثة
-    return { type: 'product_details' } // هنستخدم lastProduct من الـ history
+    return { type: 'product_details' }
   }
   
   // 3. طلب تصنيف معين
@@ -180,9 +179,15 @@ function getRequestType(query: string, products: any[]): {
     return { type: 'category', category: 'ركن' }
   if (q.includes('طرابيزات') || q.includes('ترابيزات') || q.includes('طاولات')) 
     return { type: 'category', category: 'طرابيزات' }
+  if (q.includes('جزمات') || q.includes('جزمة')) 
+    return { type: 'category', category: 'جزمات' }
+  if (q.includes('فوتية') || q.includes('فوتيه')) 
+    return { type: 'category', category: 'فوتية' }
+  if (q.includes('كراسي') || q.includes('كرسي')) 
+    return { type: 'category', category: 'كراسي' }
   
   // 4. طلب إحصائيات
-  if (q.includes('التصنيفات') || q.includes('الأقسام') || q.includes('إيه عندك') || q.includes('عندك ايه')) {
+  if (q.includes('التصنيفات') || q.includes('الأقسام') || q.includes('إيه عندك') || q.includes('عندك ايه') || q.includes('عندك إيه')) {
     return { type: 'stats' }
   }
   
@@ -273,7 +278,7 @@ export async function POST(req: NextRequest) {
     // إضافة معلومات عن المنتجات
     if (products && products.length > 0) {
       systemPrompt += `\n\nالمنتجات المتاحة حاليًا:`
-      products.forEach(p => {
+      products.forEach((p: any) => {
         systemPrompt += `\n- المنتج: ${p.title}`
         systemPrompt += `\n  السعر: ${p.price} جنيه`
         systemPrompt += `\n  التصنيف: ${p.category}`
@@ -287,7 +292,7 @@ export async function POST(req: NextRequest) {
     if (history.messages.length > 1) {
       const recentMessages = history.messages.slice(-6)
       systemPrompt += `\n\nالمحادثة السابقة:`
-      recentMessages.forEach((msg) => {
+      recentMessages.forEach((msg: any) => {
         if (msg.role === 'user') {
           systemPrompt += `\nالعميل: ${msg.content}`
         }
@@ -322,12 +327,19 @@ export async function POST(req: NextRequest) {
     }
     else if (requestType.type === 'category' && requestType.category) {
       // عرض منتجات التصنيف
-      const categoryProducts = products?.filter(p => p.category === requestType.category) || []
+      const categoryProducts = products?.filter((p: any) => p.category === requestType.category) || []
       if (categoryProducts.length > 0) {
         finalResponse += `<h3 style="color: #333; margin: 20px 0 15px 0;">${CATEGORIES.find(c => c.name === requestType.category)?.icon} منتجات ${requestType.category}:</h3>`
-        categoryProducts.forEach(product => {
+        categoryProducts.forEach((product: any) => {
           finalResponse += formatProductCard(product)
         })
+      } else {
+        finalResponse += `<p style="color: #e74c3c; margin: 15px 0;">❌ للأسف ${requestType.category} مش متوفر حالياً.</p>`
+        const availableCategories = products?.filter((p: any) => p.category).map((p: any) => p.category) || []
+        const uniqueCategories = [...new Set(availableCategories)]
+        if (uniqueCategories.length > 0) {
+          finalResponse += `<p style="color: #333;">✅ المتاح دلوقتي: ${uniqueCategories.join('، ')}</p>`
+        }
       }
     }
     else if (requestType.type === 'stats') {
