@@ -4,33 +4,67 @@ import { useState, useEffect } from "react"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import PortfolioGrid from "@/components/portfolio-grid"
-import { Sparkles, Shield, Truck, Award, ChevronDown, Filter, Grid, List } from "lucide-react"
-import { supabase } from "@/lib/supabaseClient"
+import { Sparkles, Shield, Truck, Award, ChevronDown, Filter, Grid, List, Clock } from "lucide-react"
+import { createClient } from "@/lib/supabase/client" // ✅ تعديل الاستيراد
+import Link from "next/link"
 
 export default function PortfolioPage() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [products, setProducts] = useState<any[]>([])
+  const [flashSales, setFlashSales] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  // جلب المنتجات من Supabase
+  // إنشاء عميل Supabase
+  const supabase = createClient()
+
+  // جلب المنتجات والعروض من Supabase
   useEffect(() => {
-    async function fetchProducts() {
-      const { data, error } = await supabase
+    async function fetchData() {
+      setLoading(true)
+      
+      // جلب المنتجات
+      const { data: productsData, error: productsError } = await supabase
         .from('products')
         .select('*')
         .order('createdAt', { ascending: false })
       
-      if (error) {
-        console.error('Error fetching products:', error)
+      if (productsError) {
+        console.error('Error fetching products:', productsError)
       } else {
-        setProducts(data || [])
+        setProducts(productsData || [])
       }
+
+      // جلب العروض النشطة (غير المنتهية)
+      const now = new Date().toISOString()
+      const { data: salesData, error: salesError } = await supabase
+        .from('flash_sales')
+        .select('*')
+        .gte('end_date', now)
+        .eq('is_active', true)
+      
+      if (salesError) {
+        console.error('Error fetching flash sales:', salesError)
+      } else {
+        setFlashSales(salesData || [])
+      }
+
       setLoading(false)
     }
 
-    fetchProducts()
-  }, [])
+    fetchData()
+  }, [supabase])
+
+  // دالة للتحقق مما إذا كان المنتج عليه عرض
+  const getProductSale = (productId: number) => {
+    return flashSales.find(sale => sale.product_ids?.includes(productId))
+  }
+
+  // إضافة معلومات العرض لكل منتج
+  const productsWithSales = products.map(product => ({
+    ...product,
+    sale: getProductSale(product.id)
+  }))
 
   // تتبع التمرير لزر العودة للأعلى
   useEffect(() => {
@@ -61,6 +95,26 @@ export default function PortfolioPage() {
       <Header />
       
       <main className="flex-1">
+        {/* Banner العروض الحية - يظهر فقط إذا كان فيه عروض */}
+        {flashSales.length > 0 && (
+          <div className="bg-gradient-to-r from-red-500 to-red-600 text-white py-3 px-4">
+            <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🔥</span>
+                <span className="font-bold">عروض حية! خصومات تصل إلى {Math.max(...flashSales.map(s => s.discount_percentage))}%</span>
+                <Clock className="w-4 h-4 mr-1" />
+                <span>لفترة محدودة</span>
+              </div>
+              <Link 
+                href="/flash-sales" 
+                className="bg-white text-red-600 px-4 py-1.5 rounded-full text-sm font-bold hover:bg-red-50 transition"
+              >
+                تسوق الآن
+              </Link>
+            </div>
+          </div>
+        )}
+
         {/* Page Header */}
         <section className="relative py-12 md:py-20 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5"></div>
@@ -152,10 +206,10 @@ export default function PortfolioPage() {
           </div>
         </div>
 
-        {/* Portfolio Grid Section */}
+        {/* Portfolio Grid Section - نمرر المنتجات مع العروض */}
         <section className="py-12 md:py-16">
           <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-            <PortfolioGrid viewMode={viewMode} products={products} />
+            <PortfolioGrid viewMode={viewMode} products={productsWithSales} />
           </div>
         </section>
 

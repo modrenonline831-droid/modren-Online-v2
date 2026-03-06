@@ -1,10 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
+export async function middleware(req: NextRequest) {
+  // إنشاء response مؤقت
+  let res = NextResponse.next({
     request: {
-      headers: request.headers,
+      headers: req.headers,
     },
   })
 
@@ -13,32 +15,58 @@ export async function middleware(request: NextRequest) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll()
+        get(name: string) {
+          return req.cookies.get(name)?.value
         },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
+        set(name: string, value: string, options: any) {
+          // تحديث الكوكيز في الـ response
+          res.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: any) {
+          // حذف الكوكيز من الـ response
+          res.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
         },
       },
     }
   )
 
-  // تحديث الجلسة إذا انتهت صلاحيتها - ضروري للحفاظ على حالة تسجيل الدخول
-  const { data: { user } } = await supabase.auth.getUser()
+  // تحديث الجلسة - مهم جداً!
+  const { data: { session }, error } = await supabase.auth.getSession()
+  
+  if (error) {
+    console.error('Middleware session error:', error)
+  }
 
-  return response
+  // قائمة المسارات المحمية
+  const protectedPaths = ['/admin/flash-sales', '/admin/products', '/admin/dashboard']
+  
+  const isProtectedPath = protectedPaths.some(path => 
+    req.nextUrl.pathname.startsWith(path)
+  )
+
+  // إذا كان المسار محمياً ولا يوجد session، حول إلى صفحة تسجيل الدخول
+  if (isProtectedPath && !session) {
+    const redirectUrl = new URL('/admin/login', req.url)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  // إذا كان المسار هو صفحة تسجيل الدخول والمستخدم مسجل بالفعل، حول إلى صفحة العروض
+  if (req.nextUrl.pathname === '/admin/login' && session) {
+    const redirectUrl = new URL('/admin/flash-sales', req.url)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  return res
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ['/admin/:path*'],
 }

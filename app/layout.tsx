@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Cairo, Tajawal } from "next/font/google"
 import "./globals.css"
+import Script from "next/script"
 
 // خطوط عربية متوافقة
 const cairo = Cairo({
@@ -38,36 +39,10 @@ export const metadata: Metadata = {
   description: `متجر ${SITE_NAME} للأثاث الدمياطي المودرن. نتعامل أيضاً بـ (مودرين، مودرين اونلاين، أثاث مودرن اونلاين، مودرن أونلاين). مجموعات ركن فاخرة، كنب، غرف نوم، طاولات طعام، خزانات ملابس. خشب زان طبيعي، ضمان 5 سنوات، توصيل لجميع المحافظات.`,
   
   keywords: [
-    // كل الكلمات المفتاحية
     "مودرن أونلاين", "modren online", "مودرين", "مودرين اونلاين",
     "أثاث مودرن اونلاين", "modern online", "modrenonline", "modrenonline.com",
-    "مودرين اونلاين كوم", "مودرن اونلاين كوم", "مودرن انلاين", "مودرين انلاين",
-    "مودرن اون لاين", "مودرين اون لاين", "موديرن اونلاين", "موديرين اونلاين",
-    
-    // أثاث دمياطي
-    "أثاث دمياطي", "أثاث دمياط", "اثاث دمياطي", "اثاث دمياط",
-    "أثاث منزلي دمياطي", "اثاث منزلي دمياطي", "أثاث منزلي دمياط",
-    "أثاث دمياطي مودرن", "اثاث دمياطي مودرن", "أثاث دمياط مودرن",
-    "أثاث دمياطي حديث", "اثاث دمياطي حديث", "أثاث دمياطي عصري",
-    
-    // أثاث مصري
-    "أثاث مصري", "اثاث مصري", "أثاث مصر", "اثاث مصر",
-    "أثاث مصري دمياطي", "اثاث مصري دمياطي", "أثاث مصري مودرن",
-    
-    // منتجات محددة
-    "مجموعات ركن دمياطي", "مجموعات ركن", "طقم ركن", "مجلس عربي",
-    "كنب مودرن دمياطي", "كنب دمياطي", "كنب مودرن", "كنب حديث",
-    "غرف نوم دمياطي", "غرف نوم", "غرف نوم مودرن", "غرف نوم حديثة",
-    "طاولات طعام", "طاولات طعام دمياطي", "طاولات طعام مودرن",
-    "خزانات ملابس", "خزانات ملابس دمياطي", "خزانات ملابس مودرن",
-    
-    // طقم روسكي
-    "طقم روسكي", "طقم روسكي دمياطي", "طقم روسكي مودرن",
-    "طقم روسكي حديث", "طقم ركن روسكي", "مجموعة روسكي",
-    
-    // ضمان وتوصيل
-    "ضمان 5 سنوات أثاث", "ضمان أثاث", "ضمان 5 سنوات",
-    "توصيل أثاث دمياطي", "توصيل أثاث", "توصيل لجميع المحافظات",
+    "أثاث دمياطي", "أثاث دمياط", "مجموعات ركن دمياطي", "كنب مودرن دمياطي",
+    "ضمان 5 سنوات أثاث", "توصيل أثاث دمياطي",
   ],
   
   openGraph: {
@@ -76,7 +51,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: SITE_NAME,
     title: `${SITE_NAME} | أثاث منزلي دمياطي مودرن`,
-    description: "متجر أثاث دمياطي مودرن | مودرن أونلاين (مودرين اونلاين، أثاث مودرن اونلاين، modern online، modren online)",
+    description: "متجر أثاث دمياطي مودرن | مودرن أونلاين",
     images: [
       {
         url: "/og-image.jpg",
@@ -90,11 +65,10 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: `${SITE_NAME} | أثاث منزلي دمياطي مودرن`,
-    description: "متجر أثاث دمياطي مودرن | مودرن أونلاين (مودرين اونلاين، أثاث مودرن اونلاين)",
+    description: "متجر أثاث دمياطي مودرن | مودرن أونلاين",
     images: ["/og-image.jpg"],
   },
   
-  // ⭐ **صور الموقع اللي لسه في public** ⭐
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -105,12 +79,6 @@ export const metadata: Metadata = {
     ],
     apple: [
       { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-    other: [
-      {
-        rel: "logo",
-        url: "/logo.png",
-      },
     ],
   },
   
@@ -126,7 +94,7 @@ const jsonLd = {
   "@type": "FurnitureStore",
   "@id": `${SITE_URL}/#store`,
   "name": SITE_NAME,
-  "alternateName": ["مودرين اونلاين", "أثاث مودرن اونلاين", "مودرين", "Modern Online", "Modren Online"],
+  "alternateName": ["مودرين اونلاين", "أثاث مودرن اونلاين", "Modern Online", "Modren Online"],
   "description": "متجر أثاث منزلي دمياطي متخصص في الأثاث المودرن ومجموعات الركن بضمان 5 سنوات",
   "url": SITE_URL,
   "telephone": "+201015262864",
@@ -158,7 +126,6 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl" className={`${cairo.variable} ${tajawal.variable}`}>
       <head>
-        {/* Basic Meta Tags */}
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         
@@ -168,46 +135,46 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
         
-        {/* Essential SEO Meta Tags */}
         <meta name="robots" content="index, follow" />
         <link rel="canonical" href={SITE_URL} />
-        <meta name="format-detection" content="telephone=yes" />
         
-        {/* ⭐ **صور الموقع اللي لسه في public** ⭐ */}
-        
-        {/* Favicon - جميع الأحجام */}
+        {/* Favicons */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
         <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
-        
-        {/* Apple Touch Icon */}
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
-        
-        {/* Android/Chrome Icons - PWA */}
         <link rel="icon" href="/logo-192x192.png" type="image/png" sizes="192x192" />
         <link rel="icon" href="/logo-512x512.png" type="image/png" sizes="512x512" />
         
-        {/* Logo */}
-        <link rel="logo" href="/logo.png" type="image/png" />
-        
-        {/* OG Image للمشاركة */}
+        {/* OG Image */}
         <meta property="og:image" content="/og-image.jpg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content={`${SITE_NAME} - أثاث منزلي مودرن`} />
-        
-        {/* WhatsApp Button Animation */}
-        <style>{`
-          @keyframes whatsapp-pulse {
-            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
-            70% { box-shadow: 0 0 0 15px rgba(37, 211, 102, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
-          }
-        `}</style>
       </head>
       
       <body className={`${cairo.className} min-h-screen bg-gray-50 text-gray-900 antialiased`}>
         {children}
+        
+        {/* OneSignal SDK */}
+        <Script
+          src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+          strategy="afterInteractive"
+        />
+        <Script id="onesignal-init" strategy="afterInteractive">
+          {`
+            window.OneSignalDeferred = window.OneSignalDeferred || [];
+            OneSignalDeferred.push(function(OneSignal) {
+              OneSignal.init({
+                appId: "YOUR_ONESIGNAL_APP_ID", // استبدل بـ App ID الخاص بك
+                safari_web_id: "YOUR_SAFARI_WEB_ID", // اختياري
+                notifyButton: {
+                  enable: true,
+                },
+                allowLocalhostAsSecureOrigin: true,
+              });
+            });
+          `}
+        </Script>
         
         {/* WhatsApp Button */}
         <a 

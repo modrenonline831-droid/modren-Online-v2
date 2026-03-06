@@ -22,7 +22,7 @@ export default function AdminProductList({ products }: { products: any[] }) {
   }
 
   return (
-    <div>
+    <div dir="rtl">
       <button
         onClick={() => setEditingProduct({})}
         className="mb-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
@@ -97,18 +97,22 @@ function ProductForm({ product, onClose, onSave }: { product: any; onClose: () =
   const supabase = createClient()
   const router = useRouter()
 
+  // ✅ دالة معالجة التغيير المحسنة – تدعم المسافة والكتابة بشكل طبيعي
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target
+    
+    // ✅ لا نمنع الحدث أو نتدخل فيه
     if (type === 'checkbox') {
-      setFormData({ ...formData, [name]: (e.target as HTMLInputElement).checked })
+      const checked = (e.target as HTMLInputElement).checked
+      setFormData((prev: any) => ({ ...prev, [name]: checked }))
     } else {
-      setFormData({ ...formData, [name]: value })
+      setFormData((prev: any) => ({ ...prev, [name]: value }))
     }
   }
 
   const handleArrayChange = (name: string, value: string) => {
     const arr = value.split(',').map(item => item.trim())
-    setFormData({ ...formData, [name]: arr })
+    setFormData((prev: any) => ({ ...prev, [name]: arr }))
   }
 
   // قائمة الأيقونات المتاحة
@@ -137,11 +141,8 @@ function ProductForm({ product, onClose, onSave }: { product: any; onClose: () =
         .from('product-images')
         .upload(filePath, file)
 
-      if (uploadError) {
-        throw uploadError
-      }
+      if (uploadError) throw uploadError
 
-      // الحصول على الرابط العام للصورة
       const { data: { publicUrl } } = supabase.storage
         .from('product-images')
         .getPublicUrl(filePath)
@@ -163,7 +164,7 @@ function ProductForm({ product, onClose, onSave }: { product: any; onClose: () =
 
     const publicUrl = await uploadImage(file)
     if (publicUrl) {
-      setFormData({ ...formData, image: publicUrl })
+      setFormData((prev: any) => ({ ...prev, image: publicUrl }))
     }
   }
 
@@ -195,9 +196,10 @@ function ProductForm({ product, onClose, onSave }: { product: any; onClose: () =
         uploadedUrls.push(publicUrl)
       }
 
-      // دمج الصور الجديدة مع القديمة
-      const existingImages = formData.images || []
-      setFormData({ ...formData, images: [...existingImages, ...uploadedUrls] })
+      setFormData((prev: any) => ({
+        ...prev,
+        images: [...(prev.images || []), ...uploadedUrls]
+      }))
     } catch (error) {
       console.error('Error uploading images:', error)
       alert('فشل رفع الصور الإضافية')
@@ -208,15 +210,16 @@ function ProductForm({ product, onClose, onSave }: { product: any; onClose: () =
 
   // حذف صورة من قائمة الصور الإضافية
   const removeImage = (indexToRemove: number) => {
-    const updatedImages = formData.images.filter((_: any, index: number) => index !== indexToRemove)
-    setFormData({ ...formData, images: updatedImages })
+    setFormData((prev: any) => ({
+      ...prev,
+      images: prev.images.filter((_: any, index: number) => index !== indexToRemove)
+    }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     
-    // التأكد من وجود جلسة نشطة
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {
       alert('يجب تسجيل الدخول أولاً')
@@ -244,7 +247,7 @@ function ProductForm({ product, onClose, onSave }: { product: any; onClose: () =
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" dir="rtl">
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
         <h2 className="text-xl font-bold mb-4">{product.id ? 'تعديل المنتج' : 'إضافة منتج جديد'}</h2>
         
@@ -285,7 +288,6 @@ function ProductForm({ product, onClose, onSave }: { product: any; onClose: () =
           <div>
             <label className="block text-sm font-medium mb-1">الصور الإضافية</label>
             
-            {/* عرض الصور المرفوعة */}
             {formData.images && formData.images.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-3">
                 {formData.images.map((img: string, index: number) => (
@@ -360,6 +362,9 @@ function ProductForm({ product, onClose, onSave }: { product: any; onClose: () =
               onChange={handleChange}
               className="w-full border p-2 rounded"
               rows={3}
+              // ✅ إضافة خصائص لتحسين الكتابة
+              spellCheck="true"
+              autoCorrect="on"
             />
           </div>
           
