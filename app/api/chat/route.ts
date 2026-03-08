@@ -54,7 +54,117 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
   return { allowed: true, remaining: MAX_MESSAGES_PER_DAY - record.count }
 }
 
-// دالة لعرض المنتج مع الرابط الصحيح
+// ==================== دالة البحث عن طلب بالكود ====================
+async function getOrderStatus(orderNumber: string) {
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('order_number', orderNumber)
+    .single()
+  
+  if (error || !data) return null
+  return data
+}
+
+// ==================== دالة تنسيق رد حالة الطلب ====================
+function formatOrderStatus(order: any) {
+  const statusColors: any = {
+    'قيد المراجعة': { color: '#f39c12', text: '⏳ قيد المراجعة' },
+    'تم التواصل': { color: '#3498db', text: '📞 تم التواصل' },
+    'تم التأكيد': { color: '#27ae60', text: '✅ تم التأكيد' },
+    'تم الشحن': { color: '#9b59b6', text: '📦 تم الشحن' },
+    'تم التوصيل': { color: '#2ecc71', text: '🏠 تم التوصيل' },
+    'ملغي': { color: '#e74c3c', text: '❌ ملغي' }
+  }
+  
+  const status = statusColors[order.status] || statusColors['قيد المراجعة']
+  
+  // تنسيق التاريخ
+  const orderDate = new Date(order.created_at).toLocaleDateString('ar-EG', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+  
+  return `
+    <div style="background: white; border-radius: 16px; padding: 20px; margin: 15px 0; border: 2px solid ${status.color}20; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+        <span style="font-size: 24px;">🔍</span>
+        <h3 style="margin: 0; color: ${status.color};">تفاصيل الطلب ${order.order_number}</h3>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+          <div>
+            <p style="margin: 5px 0; color: #666;"><strong>📦 المنتج:</strong></p>
+            <p style="margin: 0; font-weight: 500;">${order.product_title}</p>
+          </div>
+          <div>
+            <p style="margin: 5px 0; color: #666;"><strong>💰 المبلغ:</strong></p>
+            <p style="margin: 0; font-weight: bold; color: #27ae60;">${order.deposit_amount} جنيه</p>
+          </div>
+          <div>
+            <p style="margin: 5px 0; color: #666;"><strong>👤 العميل:</strong></p>
+            <p style="margin: 0;">${order.customer_name}</p>
+          </div>
+          <div>
+            <p style="margin: 5px 0; color: #666;"><strong>📱 رقم العميل:</strong></p>
+            <p style="margin: 0; direction: ltr;">${order.customer_phone}</p>
+          </div>
+          <div>
+            <p style="margin: 5px 0; color: #666;"><strong>💳 طريقة الدفع:</strong></p>
+            <p style="margin: 0;">${
+              order.payment_method === 'vodafone' ? '📱 فودافون كاش' :
+              order.payment_method === 'instapay' ? '💳 إنستاباي' : '🔗 بينانس'
+            }</p>
+          </div>
+          <div>
+            <p style="margin: 5px 0; color: #666;"><strong>📅 تاريخ الطلب:</strong></p>
+            <p style="margin: 0;">${orderDate}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin: 15px 0; padding: 15px; background: ${status.color}10; border-radius: 10px; border-right: 4px solid ${status.color};">
+        <p style="margin: 0; display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">${status.text.split(' ')[0]}</span>
+          <span style="font-weight: bold; color: ${status.color};">${status.text}</span>
+        </p>
+      </div>
+      
+      ${order.admin_reply ? `
+        <div style="margin-top: 15px; padding: 15px; background: #e8f5e9; border-radius: 10px;">
+          <p style="margin: 0 0 8px 0; display: flex; align-items: center; gap: 5px;">
+            <span>📝</span>
+            <strong>آخر رد من الإدارة:</strong>
+          </p>
+          <p style="margin: 0; padding-right: 20px; color: #2c3e50;">${order.admin_reply}</p>
+          <p style="margin: 8px 0 0 0; font-size: 12px; color: #999;">
+            ${order.last_admin_message ? new Date(order.last_admin_message).toLocaleString('ar-EG') : ''}
+          </p>
+        </div>
+      ` : ''}
+      
+      <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+        <a href="https://wa.me/20101526264?text=${encodeURIComponent(`استفسار عن الطلب ${order.order_number}`)}" 
+           target="_blank" 
+           style="flex: 1; padding: 12px 20px; background: #25D366; color: white; text-decoration: none; border-radius: 8px; text-align: center; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px;">
+          <span>💬</span>
+          تواصل مع الدعم
+        </a>
+        <button onclick="navigator.clipboard.writeText('${order.order_number}')" 
+                style="padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px;">
+          <span>📋</span>
+          نسخ الكود
+        </button>
+      </div>
+    </div>
+  `
+}
+
+// ==================== دالة عرض المنتج مع الرابط الصحيح ====================
 function formatProductCard(product: any) {
   const productUrl = `https://www.modrenonline.com/portfolio?product=${product.id}`
   const whatsappUrl = `https://wa.me/20101526264?text=${encodeURIComponent(`أنا عايز استفسر عن ${product.title || 'منتج'}`)}`
@@ -85,7 +195,7 @@ function formatProductCard(product: any) {
   `
 }
 
-// دالة لعرض تفاصيل المنتج بشكل كامل
+// ==================== دالة عرض تفاصيل المنتج كاملة ====================
 function formatProductDetails(product: any) {
   const productUrl = `https://www.modrenonline.com/portfolio?product=${product.id}`
   const whatsappUrl = `https://wa.me/20101526264?text=${encodeURIComponent(`أنا عايز استفسر عن ${product.title}`)}`
@@ -134,7 +244,7 @@ function formatProductDetails(product: any) {
   `
 }
 
-// دالة لفحص إذا كان السؤال عن منتج معين
+// ==================== دالة لفحص إذا كان السؤال عن منتج معين ====================
 function findProductInQuery(query: string, products: any[]): any | null {
   const q = query.toLowerCase()
   
@@ -153,26 +263,33 @@ function findProductInQuery(query: string, products: any[]): any | null {
   return null
 }
 
-// دالة لفحص نوع الطلب
+// ==================== دالة لفحص نوع الطلب ====================
 function getRequestType(query: string, products: any[]): { 
-  type: 'product_details' | 'category' | 'stats' | 'whatsapp' | 'none', 
+  type: 'product_details' | 'category' | 'stats' | 'whatsapp' | 'order_tracking' | 'none', 
   product?: any,
-  category?: string 
+  category?: string,
+  orderCode?: string 
 } {
   const q = query.toLowerCase()
   
-  // 1. البحث عن منتج معين
+  // 1. البحث عن كود طلب
+  const orderCodeMatch = query.match(/ORD-\d+-\d+/)
+  if (orderCodeMatch) {
+    return { type: 'order_tracking', orderCode: orderCodeMatch[0] }
+  }
+  
+  // 2. البحث عن منتج معين
   const specificProduct = findProductInQuery(query, products)
   if (specificProduct) {
     return { type: 'product_details', product: specificProduct }
   }
   
-  // 2. طلب تفاصيل عن منتج
+  // 3. طلب تفاصيل عن منتج
   if (q.includes('مواصفات') || q.includes('تفاصيل') || q.includes('عرفني') || q.includes('مزيد')) {
     return { type: 'product_details' }
   }
   
-  // 3. طلب تصنيف معين
+  // 4. طلب تصنيف معين
   if (q.includes('أنترية') || q.includes('انتريه') || q.includes('كنب')) 
     return { type: 'category', category: 'أنترية مغلف' }
   if (q.includes('ركن') || q.includes('اركنة')) 
@@ -186,12 +303,12 @@ function getRequestType(query: string, products: any[]): {
   if (q.includes('كراسي') || q.includes('كرسي')) 
     return { type: 'category', category: 'كراسي' }
   
-  // 4. طلب إحصائيات
+  // 5. طلب إحصائيات
   if (q.includes('التصنيفات') || q.includes('الأقسام') || q.includes('إيه عندك') || q.includes('عندك ايه') || q.includes('عندك إيه')) {
     return { type: 'stats' }
   }
   
-  // 5. طلب واتساب
+  // 6. طلب واتساب
   if (q.includes('واتساب') || q.includes('كلمني') || q.includes('الدعم')) {
     return { type: 'whatsapp' }
   }
@@ -249,57 +366,82 @@ export async function POST(req: NextRequest) {
     // تحديد نوع الطلب
     const requestType = getRequestType(userMessage.content, products || [])
 
-    // استخدام Gemini للرد الطبيعي
-    const apiKey = process.env.GEMINI_API_KEY
-    if (!apiKey) {
-      return new Response(
-        JSON.stringify({ response: 'مودرينو في إجازة دلوقتي 😴' }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-      )
-    }
+    // بناء الرد النهائي
+    let finalResponse = `
+      <div style="font-family: Arial, sans-serif; direction: rtl; max-width: 600px; margin: 0 auto;">
+    `
 
-    const genAI = new GoogleGenerativeAI(apiKey)
-    
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
-      generationConfig: { 
-        temperature: 0.8, 
-        maxOutputTokens: 1000
+    // معالجة تتبع الطلب
+    if (requestType.type === 'order_tracking' && requestType.orderCode) {
+      const order = await getOrderStatus(requestType.orderCode)
+      if (order) {
+        finalResponse += formatOrderStatus(order)
+      } else {
+        finalResponse += `
+          <div style="background: #fee; padding: 20px; border-radius: 12px; text-align: center; margin: 20px 0;">
+            <span style="font-size: 48px; display: block; margin-bottom: 15px;">❌</span>
+            <p style="color: #e74c3c; font-size: 18px; font-weight: bold;">للأسف الكود ${requestType.orderCode} مش موجود</p>
+            <p style="color: #666; margin: 10px 0;">تأكد من كتابة الكود صح أو تواصل مع الدعم</p>
+            <a href="https://wa.me/20101526264" target="_blank" 
+               style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: #25D366; color: white; text-decoration: none; border-radius: 6px;">
+              💬 تواصل مع الدعم
+            </a>
+          </div>
+        `
       }
-    })
-
-    // تحضير الـ prompt حسب نوع الطلب
-    let systemPrompt = `أنت "مودرينو"، مساعد موقع مودرن أونلاين للأثاث الدمياطي المودرن.`
-
-    if (isFirstMessage) {
-      systemPrompt += `\nهذه أول محادثة مع العميل، فعرف بنفسك: "أهلاً بيك في مودرن أونلاين، أنا مودرينو المساعد الذكي. عندنا تشكيلة من الأثاث الدمياطي المودرن، تحب تشوف إيه؟"`
     }
+    else {
+      // استخدام Gemini للرد الطبيعي
+      const apiKey = process.env.GEMINI_API_KEY
+      if (!apiKey) {
+        return new Response(
+          JSON.stringify({ response: 'مودرينو في إجازة دلوقتي 😴' }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        )
+      }
 
-    // إضافة معلومات عن المنتجات
-    if (products && products.length > 0) {
-      systemPrompt += `\n\nالمنتجات المتاحة حاليًا:`
-      products.forEach((p: any) => {
-        systemPrompt += `\n- المنتج: ${p.title}`
-        systemPrompt += `\n  السعر: ${p.price} جنيه`
-        systemPrompt += `\n  التصنيف: ${p.category}`
-        if (p.description) {
-          systemPrompt += `\n  المواصفات: ${p.description.substring(0, 100)}...`
+      const genAI = new GoogleGenerativeAI(apiKey)
+      
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.5-flash",
+        generationConfig: { 
+          temperature: 0.8, 
+          maxOutputTokens: 1000
         }
       })
-    }
 
-    // إضافة سياق المحادثة
-    if (history.messages.length > 1) {
-      const recentMessages = history.messages.slice(-6)
-      systemPrompt += `\n\nالمحادثة السابقة:`
-      recentMessages.forEach((msg: any) => {
-        if (msg.role === 'user') {
-          systemPrompt += `\nالعميل: ${msg.content}`
-        }
-      })
-    }
+      // تحضير الـ prompt حسب نوع الطلب
+      let systemPrompt = `أنت "مودرينو"، مساعد موقع مودرن أونلاين للأثاث الدمياطي المودرن.`
 
-    systemPrompt += `\n\nالعميل: ${userMessage.content}\n
+      if (isFirstMessage) {
+        systemPrompt += `\nهذه أول محادثة مع العميل، فعرف بنفسك: "أهلاً بيك في مودرن أونلاين، أنا مودرينو المساعد الذكي. عندنا تشكيلة من الأثاث الدمياطي المودرن، تحب تشوف إيه؟"`
+      }
+
+      // إضافة معلومات عن المنتجات
+      if (products && products.length > 0) {
+        systemPrompt += `\n\nالمنتجات المتاحة حاليًا:`
+        products.forEach((p: any) => {
+          systemPrompt += `\n- المنتج: ${p.title}`
+          systemPrompt += `\n  السعر: ${p.price} جنيه`
+          systemPrompt += `\n  التصنيف: ${p.category}`
+          if (p.description) {
+            systemPrompt += `\n  المواصفات: ${p.description.substring(0, 100)}...`
+          }
+        })
+      }
+
+      // إضافة سياق المحادثة
+      if (history.messages.length > 1) {
+        const recentMessages = history.messages.slice(-6)
+        systemPrompt += `\n\nالمحادثة السابقة:`
+        recentMessages.forEach((msg: any) => {
+          if (msg.role === 'user') {
+            systemPrompt += `\nالعميل: ${msg.content}`
+          }
+        })
+      }
+
+      systemPrompt += `\n\nالعميل: ${userMessage.content}\n
 تعليمات الرد:
 - رد بالعامية المصرية بشكل طبيعي
 - استخدم إيموجيات مناسبة
@@ -309,67 +451,66 @@ export async function POST(req: NextRequest) {
 
 رد مودرينو:`
 
-    const result = await model.generateContent(systemPrompt)
-    const aiResponse = result.response.text()
+      const result = await model.generateContent(systemPrompt)
+      const aiResponse = result.response.text()
 
-    // بناء الرد النهائي
-    let finalResponse = `
-      <div style="font-family: Arial, sans-serif; direction: rtl; max-width: 600px; margin: 0 auto;">
+      finalResponse += `
         <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; border-right: 4px solid #3498db; margin-bottom: 20px;">
           <p style="margin: 0; font-size: 16px; line-height: 1.8; color: #2c3e50;">${aiResponse}</p>
         </div>
-    `
+      `
 
-    // إضافة المحتوى المطلوب حسب نوع الطلب
-    if (requestType.type === 'product_details' && requestType.product) {
-      // عرض تفاصيل المنتج المطلوب
-      finalResponse += formatProductDetails(requestType.product)
-    }
-    else if (requestType.type === 'category' && requestType.category) {
-      // عرض منتجات التصنيف
-      const categoryProducts = products?.filter((p: any) => p.category === requestType.category) || []
-      if (categoryProducts.length > 0) {
-        finalResponse += `<h3 style="color: #333; margin: 20px 0 15px 0;">${CATEGORIES.find(c => c.name === requestType.category)?.icon} منتجات ${requestType.category}:</h3>`
-        categoryProducts.forEach((product: any) => {
-          finalResponse += formatProductCard(product)
-        })
-      } else {
-        finalResponse += `<p style="color: #e74c3c; margin: 15px 0;">❌ للأسف ${requestType.category} مش متوفر حالياً.</p>`
-        const availableCategories = products?.filter((p: any) => p.category).map((p: any) => p.category) || []
-        const uniqueCategories = [...new Set(availableCategories)]
-        if (uniqueCategories.length > 0) {
-          finalResponse += `<p style="color: #333;">✅ المتاح دلوقتي: ${uniqueCategories.join('، ')}</p>`
+      // إضافة المحتوى المطلوب حسب نوع الطلب
+      if (requestType.type === 'product_details' && requestType.product) {
+        // عرض تفاصيل المنتج المطلوب
+        finalResponse += formatProductDetails(requestType.product)
+      }
+      else if (requestType.type === 'category' && requestType.category) {
+        // عرض منتجات التصنيف
+        const categoryProducts = products?.filter((p: any) => p.category === requestType.category) || []
+        if (categoryProducts.length > 0) {
+          finalResponse += `<h3 style="color: #333; margin: 20px 0 15px 0;">${CATEGORIES.find(c => c.name === requestType.category)?.icon} منتجات ${requestType.category}:</h3>`
+          categoryProducts.forEach((product: any) => {
+            finalResponse += formatProductCard(product)
+          })
+        } else {
+          finalResponse += `<p style="color: #e74c3c; margin: 15px 0;">❌ للأسف ${requestType.category} مش متوفر حالياً.</p>`
+          const availableCategories = products?.filter((p: any) => p.category).map((p: any) => p.category) || []
+          const uniqueCategories = [...new Set(availableCategories)]
+          if (uniqueCategories.length > 0) {
+            finalResponse += `<p style="color: #333;">✅ المتاح دلوقتي: ${uniqueCategories.join('، ')}</p>`
+          }
         }
       }
-    }
-    else if (requestType.type === 'stats') {
-      // عرض إحصائيات التصنيفات
-      finalResponse += '<div style="background: white; border-radius: 12px; padding: 16px; margin-top: 20px;">'
-      finalResponse += '<h4 style="margin: 0 0 12px 0;">📊 التصنيفات المتاحة:</h4>'
-      finalResponse += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">'
-      
-      CATEGORIES.forEach(cat => {
-        finalResponse += `
-          <div style="background: ${cat.count > 0 ? '#f0f9ff' : '#f5f5f5'}; padding: 10px; border-radius: 8px; text-align: center;">
-            <span style="font-size: 24px;">${cat.icon}</span>
-            <div style="font-size: 14px; font-weight: bold;">${cat.name}</div>
-            <div style="font-size: 12px; color: ${cat.count > 0 ? '#27ae60' : '#999'};">
-              ${cat.count > 0 ? `✅ ${cat.count} منتج` : '❌ غير متوفر'}
+      else if (requestType.type === 'stats') {
+        // عرض إحصائيات التصنيفات
+        finalResponse += '<div style="background: white; border-radius: 12px; padding: 16px; margin-top: 20px;">'
+        finalResponse += '<h4 style="margin: 0 0 12px 0;">📊 التصنيفات المتاحة:</h4>'
+        finalResponse += '<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">'
+        
+        CATEGORIES.forEach(cat => {
+          finalResponse += `
+            <div style="background: ${cat.count > 0 ? '#f0f9ff' : '#f5f5f5'}; padding: 10px; border-radius: 8px; text-align: center;">
+              <span style="font-size: 24px;">${cat.icon}</span>
+              <div style="font-size: 14px; font-weight: bold;">${cat.name}</div>
+              <div style="font-size: 12px; color: ${cat.count > 0 ? '#27ae60' : '#999'};">
+                ${cat.count > 0 ? `✅ ${cat.count} منتج` : '❌ غير متوفر'}
+              </div>
             </div>
+          `
+        })
+        
+        finalResponse += '</div></div>'
+      }
+      else if (requestType.type === 'whatsapp') {
+        finalResponse += `
+          <div style="margin-top: 20px; text-align: center;">
+            <a href="https://wa.me/20101526264" target="_blank" style="display: inline-block; padding: 12px 30px; background: #25D366; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+              💬 كلمنا على واتساب
+            </a>
           </div>
         `
-      })
-      
-      finalResponse += '</div></div>'
-    }
-    else if (requestType.type === 'whatsapp') {
-      finalResponse += `
-        <div style="margin-top: 20px; text-align: center;">
-          <a href="https://wa.me/20101526264" target="_blank" style="display: inline-block; padding: 12px 30px; background: #25D366; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
-            💬 كلمنا على واتساب
-          </a>
-        </div>
-      `
+      }
     }
 
     finalResponse += '</div>'
