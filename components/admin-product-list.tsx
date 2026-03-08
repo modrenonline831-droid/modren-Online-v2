@@ -32,7 +32,15 @@ export default function AdminProductList({ products }: { products: any[] }) {
         >
           إضافة منتج جديد
         </button>
-        
+        <Link
+          href="/admin/orders"
+          className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 flex items-center justify-center gap-2 w-full sm:w-auto order-1 sm:order-2"
+        >
+          <span>⚡</span>
+          <span>الاوردرات</span>
+          <span className="bg-purple-400 px-2 py-0.5 rounded-full text-xs">جديد</span>
+        </Link>
+     
         <Link
           href="/admin/flash-sales"
           className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 flex items-center justify-center gap-2 w-full sm:w-auto order-1 sm:order-2"
