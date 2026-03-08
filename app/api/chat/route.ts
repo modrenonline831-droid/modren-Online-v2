@@ -148,7 +148,7 @@ function formatOrderStatus(order: any) {
       ` : ''}
       
       <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
-        <a href="https://wa.me/20101526264?text=${encodeURIComponent(`استفسار عن الطلب ${order.order_number}`)}" 
+        <a href="https://wa.me/201015262864?text=${encodeURIComponent(`استفسار عن الطلب ${order.order_number}`)}" 
            target="_blank" 
            style="flex: 1; padding: 12px 20px; background: #25D366; color: white; text-decoration: none; border-radius: 8px; text-align: center; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 5px;">
           <span>💬</span>
@@ -167,7 +167,7 @@ function formatOrderStatus(order: any) {
 // ==================== دالة عرض المنتج مع الرابط الصحيح ====================
 function formatProductCard(product: any) {
   const productUrl = `https://www.modrenonline.com/portfolio?product=${product.id}`
-  const whatsappUrl = `https://wa.me/20101526264?text=${encodeURIComponent(`أنا عايز استفسر عن ${product.title || 'منتج'}`)}`
+  const whatsappUrl = `https://wa.me/201015262864?text=${encodeURIComponent(`أنا عايز استفسر عن ${product.title || 'منتج'}`)}`
   
   return `
     <div style="background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #eaeaea; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
@@ -198,7 +198,7 @@ function formatProductCard(product: any) {
 // ==================== دالة عرض تفاصيل المنتج كاملة ====================
 function formatProductDetails(product: any) {
   const productUrl = `https://www.modrenonline.com/portfolio?product=${product.id}`
-  const whatsappUrl = `https://wa.me/20101526264?text=${encodeURIComponent(`أنا عايز استفسر عن ${product.title}`)}`
+  const whatsappUrl = `https://wa.me/201015262864?text=${encodeURIComponent(`أنا عايز استفسر عن ${product.title}`)}`
   
   // تقسيم الوصف إذا كان موجود
   const description = product.description || 'قطعة فاخرة من الأثاث الدمياطي المودرن'
@@ -382,7 +382,7 @@ export async function POST(req: NextRequest) {
             <span style="font-size: 48px; display: block; margin-bottom: 15px;">❌</span>
             <p style="color: #e74c3c; font-size: 18px; font-weight: bold;">للأسف الكود ${requestType.orderCode} مش موجود</p>
             <p style="color: #666; margin: 10px 0;">تأكد من كتابة الكود صح أو تواصل مع الدعم</p>
-            <a href="https://wa.me/20101526264" target="_blank" 
+            <a href="https://wa.me/201015262864" target="_blank" 
                style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: #25D366; color: white; text-decoration: none; border-radius: 6px;">
               💬 تواصل مع الدعم
             </a>
@@ -505,7 +505,7 @@ export async function POST(req: NextRequest) {
       else if (requestType.type === 'whatsapp') {
         finalResponse += `
           <div style="margin-top: 20px; text-align: center;">
-            <a href="https://wa.me/20101526264" target="_blank" style="display: inline-block; padding: 12px 30px; background: #25D366; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
+            <a href="https://wa.me/201015262864" target="_blank" style="display: inline-block; padding: 12px 30px; background: #25D366; color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">
               💬 كلمنا على واتساب
             </a>
           </div>
