@@ -25,6 +25,8 @@ const [navLinks, setNavLinks] = useState([
   { label: "عنا", href: "/about", icon: "👥" },
   { label: "سياسة الشحن", href: "/Delivery Policy", icon: "🚚" },
   { label: "سياسة الأسترجاع", href: "/return-policy", icon: "↩️" },
+  { label: "التقيمات", href: "/reviews", icon: "⭐" },
+  { label: "فيديوهات الورشة", href: "/workshop", icon: "🎬" },
   { 
     label: "المنتجات", 
     href: "/portfolio",

@@ -10,7 +10,7 @@ const supabase = createClient(
 )
 
 const rateLimit = new Map<string, { count: number; date: string }>()
-const MAX_MESSAGES_PER_DAY = 15
+const MAX_MESSAGES_PER_DAY = 5 // ⬅️ تم التعديل إلى 5 رسائل
 
 // تخزين المحادثات في الذاكرة (مؤقت)
 const conversationHistory = new Map<string, { 
@@ -26,6 +26,18 @@ const CATEGORIES = [
   { name: 'جزمات', icon: '👞', count: 0 },
   { name: 'فوتية', icon: '🛋', count: 0 },
   { name: 'كراسي', icon: '💺', count: 0 }
+]
+
+// ==================== الصفحات الجديدة في الموقع ====================
+const SITE_PAGES = [
+  { path: '/', name: 'الرئيسية', icon: '🏠', description: 'الصفحة الرئيسية للموقع' },
+  { path: '/portfolio', name: 'المنتجات', icon: '🛋️', description: 'عرض جميع المنتجات' },
+  { path: '/reviews', name: 'التقييمات', icon: '⭐', description: 'تقييمات العملاء' },
+  { path: '/workshop', name: 'الورشة', icon: '🎬', description: 'فيديوهات من ورشة التصنيع' },
+  { path: '/flash-sales', name: 'العروض', icon: '⚡', description: 'العروض المؤقتة والخصومات' },
+  { path: '/track', name: 'تتبع الطلب', icon: '🔍', description: 'تتبع حالة طلبك' },
+  { path: '/about', name: 'عن الموقع', icon: 'ℹ️', description: 'معلومات عن مودرن أونلاين' },
+  { path: '/contact', name: 'اتصل بنا', icon: '📞', description: 'تواصل مع خدمة العملاء' }
 ]
 
 function getClientIp(req: NextRequest): string {
@@ -244,6 +256,29 @@ function formatProductDetails(product: any) {
   `
 }
 
+// ==================== دالة عرض صفحات الموقع ====================
+function formatSitePages() {
+  return `
+    <div style="background: white; border-radius: 16px; padding: 20px; margin: 15px 0; border: 1px solid #eaeaea;">
+      <h3 style="margin: 0 0 15px 0; color: #333; display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 24px;">🗺️</span>
+        أقسام الموقع
+      </h3>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+        ${SITE_PAGES.map(page => `
+          <a href="${page.path}" 
+             style="display: block; padding: 12px; background: #f8f9fa; border-radius: 10px; text-decoration: none; color: #333; transition: all 0.3s; border: 1px solid #eaeaea;"
+             target="_blank">
+            <div style="font-size: 20px; margin-bottom: 5px;">${page.icon}</div>
+            <div style="font-weight: bold; font-size: 14px;">${page.name}</div>
+            <div style="font-size: 11px; color: #666; margin-top: 3px;">${page.description}</div>
+          </a>
+        `).join('')}
+      </div>
+    </div>
+  `
+}
+
 // ==================== دالة لفحص إذا كان السؤال عن منتج معين ====================
 function findProductInQuery(query: string, products: any[]): any | null {
   const q = query.toLowerCase()
@@ -265,7 +300,7 @@ function findProductInQuery(query: string, products: any[]): any | null {
 
 // ==================== دالة لفحص نوع الطلب ====================
 function getRequestType(query: string, products: any[]): { 
-  type: 'product_details' | 'category' | 'stats' | 'whatsapp' | 'order_tracking' | 'none', 
+  type: 'product_details' | 'category' | 'stats' | 'whatsapp' | 'order_tracking' | 'site_pages' | 'none', 
   product?: any,
   category?: string,
   orderCode?: string 
@@ -313,6 +348,11 @@ function getRequestType(query: string, products: any[]): {
     return { type: 'whatsapp' }
   }
   
+  // 7. طلب عرض صفحات الموقع
+  if (q.includes('صفحات') || q.includes('أقسام') || q.includes('فيه إيه') || q.includes('الموقع') || q.includes('في الموقع')) {
+    return { type: 'site_pages' }
+  }
+  
   return { type: 'none' }
 }
 
@@ -324,7 +364,7 @@ export async function POST(req: NextRequest) {
     if (!allowed) {
       return new Response(
         JSON.stringify({ 
-          response: 'عذراً، خلصت الرسائل المتاحة لليوم 😊. بكره تبدأ من جديد!'
+          response: `عذراً، خلصت الـ ${MAX_MESSAGES_PER_DAY} رسائل المسموحة لليوم 😊. بكره تبدأ من جديد!`
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       )
@@ -390,6 +430,10 @@ export async function POST(req: NextRequest) {
         `
       }
     }
+    // معالجة عرض صفحات الموقع
+    else if (requestType.type === 'site_pages') {
+      finalResponse += formatSitePages()
+    }
     else {
       // استخدام Gemini للرد الطبيعي
       const apiKey = process.env.GEMINI_API_KEY
@@ -430,6 +474,12 @@ export async function POST(req: NextRequest) {
         })
       }
 
+      // إضافة معلومات عن صفحات الموقع
+      systemPrompt += `\n\nصفحات الموقع المتاحة:`
+      SITE_PAGES.forEach(page => {
+        systemPrompt += `\n- ${page.name} (${page.path}): ${page.description}`
+      })
+
       // إضافة سياق المحادثة
       if (history.messages.length > 1) {
         const recentMessages = history.messages.slice(-6)
@@ -447,6 +497,7 @@ export async function POST(req: NextRequest) {
 - استخدم إيموجيات مناسبة
 - لو سأل عن منتج معين، اشرح مواصفاته بالتفصيل من البيانات المتاحة
 - لو سأل عن حاجة مش موجودة، قوله بصراحة واقترح البديل
+- لو سأل عن أقسام الموقع، وصف له كل صفحة بإيجاز
 - خلي ردودك مفيدة ومختصرة
 
 رد مودرينو:`
@@ -513,7 +564,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    finalResponse += '</div>'
+    finalResponse += `
+      <div style="margin-top: 20px; padding: 10px; background: #e3f2fd; border-radius: 8px; text-align: center; font-size: 12px; color: #1976d2;">
+        ⏳ تبقى ليك ${remaining} رسالة من أصل ${MAX_MESSAGES_PER_DAY} لليوم
+      </div>
+    </div>`
 
     // حفظ الرد في التاريخ
     history.messages.push({ role: 'assistant', content: finalResponse })

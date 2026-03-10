@@ -45,22 +45,23 @@ export async function middleware(req: NextRequest) {
     console.error('Middleware session error:', error)
   }
 
-  // قائمة المسارات المحمية
-  const protectedPaths = ['/admin/flash-sales', '/admin/products', '/admin/dashboard']
+  // ✅ كل المسارات تحت /admin محمية
+  const isAdminPath = req.nextUrl.pathname.startsWith('/admin')
   
-  const isProtectedPath = protectedPaths.some(path => 
-    req.nextUrl.pathname.startsWith(path)
-  )
+  // استثناء صفحة تسجيل الدخول فقط
+  const isLoginPage = req.nextUrl.pathname === '/admin/login'
 
-  // إذا كان المسار محمياً ولا يوجد session، حول إلى صفحة تسجيل الدخول
-  if (isProtectedPath && !session) {
+  // إذا كان المسار يبدأ بـ /admin ومش صفحة login ومفيش session
+  if (isAdminPath && !isLoginPage && !session) {
+    console.log('🔒 Unauthorized access to:', req.nextUrl.pathname)
     const redirectUrl = new URL('/admin/login', req.url)
     return NextResponse.redirect(redirectUrl)
   }
 
-  // إذا كان المسار هو صفحة تسجيل الدخول والمستخدم مسجل بالفعل، حول إلى صفحة العروض
-  if (req.nextUrl.pathname === '/admin/login' && session) {
-    const redirectUrl = new URL('/admin/flash-sales', req.url)
+  // إذا كان المسار هو صفحة تسجيل الدخول والمستخدم مسجل بالفعل
+  if (isLoginPage && session) {
+    console.log('✅ Already logged in, redirecting to admin dashboard')
+    const redirectUrl = new URL('/admin', req.url) // حول للوحة التحكم الرئيسية
     return NextResponse.redirect(redirectUrl)
   }
 
@@ -68,5 +69,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*'], // ده بيحمي كل المسارات اللي تحت /admin
 }

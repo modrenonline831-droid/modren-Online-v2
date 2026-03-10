@@ -730,3 +730,80 @@
     right: 1rem;
   }
 }
+/* ========== تأثيرات العيد - نسخة ناعمة ومريحة للعين ========== */
+
+/* تأثير بسيط جداً على الخلفية */
+.eid-active {
+  position: relative;
+}
+
+/* زينة علوية وسفلية خفيفة جداً */
+.eid-active::before {
+  content: "🌙 ✨ 🌙";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 1rem;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 9999;
+  letter-spacing: 10px;
+}
+
+.eid-active::after {
+  content: "✨ 🌙 ✨";
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 1rem;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 9999;
+  letter-spacing: 10px;
+}
+
+/* تأثير خفيف على البطاقات - مش تغيير جذري */
+.eid-active .bg-white,
+.eid-active div[class*="card"],
+.eid-active .rounded-lg {
+  transition: all 0.3s ease;
+}
+
+.eid-active .bg-white:hover,
+.eid-active div[class*="card"]:hover,
+.eid-active .rounded-lg:hover {
+  box-shadow: 0 5px 20px rgba(255, 215, 0, 0.15);
+  border-color: rgba(255, 215, 0, 0.3) !important;
+}
+
+/* تأثير خفيف على الأزرار الرئيسية */
+.eid-active button.bg-primary,
+.eid-active .btn-primary {
+  background: linear-gradient(135deg, #2E7D32, #1B5E20) !important;
+  transition: all 0.3s ease;
+}
+
+/* تأثير بسيط على النصوص المهمة */
+.eid-active h1,
+.eid-active h2 {
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
+}
+
+/* إضافة لمسة ذهبية خفيفة للحدود */
+.eid-active .border {
+  border-color: rgba(255, 215, 0, 0.2) !important;
+}
+
+/* تأثير النجوم الخفيف */
+@keyframes twinkle-light {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.3; }
+}
+
+.eid-active .star-light {
+  animation: twinkle-light 3s ease-in-out infinite;
+}

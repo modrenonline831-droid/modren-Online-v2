@@ -152,8 +152,8 @@ export default function RootLayout({
         <meta property="og:image:height" content="630" />
       </head>
       
-      <body className={`${cairo.className} min-h-screen bg-gray-50 text-gray-900 antialiased`}>
-        {children}
+   <body className={`${cairo.className} min-h-screen bg-gray-50 text-gray-900 antialiased`}>
+  {children}
         
         {/* OneSignal SDK */}
         <Script
